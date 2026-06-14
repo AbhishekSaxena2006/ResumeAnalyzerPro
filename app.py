@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from database.mongo import collection
 from pypdf import PdfReader
 import os
+from skills import SKILLS
 
 app = FastAPI()
 
@@ -66,19 +67,15 @@ async def analyze_resume(
             if len(word) > 1
         )
 
-        matched_words = sorted(
-            list(
-                jd_words.intersection(
-                    resume_words
-                )
-            )
-        )
+        matched_words = []
+        missing_words = []
 
-        missing_words = sorted(
-            list(
-                jd_words - resume_words
-            )
-        )
+        for skill in SKILLS:
+            if skill.lower() in jd_text:
+                if skill.lower() in resume_text:
+                    matched_words.append(skill)
+                else:
+                    missing_words.append(skill)
 
         percentage = round(
             (
